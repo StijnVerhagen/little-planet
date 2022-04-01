@@ -1,8 +1,14 @@
 <template>
   <PlanetGroup ref="group">
-    <Globe ref="globe" :duration="2000" :delay="1000"
-      :radius="radius" :detail="detail" :noise-conf="noiseConf"
-      :groundColor="groundColor" :waterColor="waterColor"
+    <Globe
+      ref="globe"
+      :duration="2000"
+      :delay="1000"
+      :radius="radius"
+      :detail="detail"
+      :noise-conf="noiseConf"
+      :groundColor="groundColor"
+      :waterColor="waterColor"
     />
     <Tree v-for="(tree, key) in trees" :key="key" v-bind="tree" />
     <Rock v-for="(rock, key) in rocks" :key="key" v-bind="rock" />
@@ -17,16 +23,16 @@
  * Not optimized, trees and rocks are not instanced (randomized geometries)
  */
 // import { watch } from 'vue';
-import { MathUtils, Plane, Raycaster, Vector3 } from 'three';
-import { Easing, Tween, remove as removeTween } from '@tweenjs/tween.js';
-import chroma from 'chroma-js';
+import { MathUtils, Plane, Raycaster, Vector3 } from "three";
+import { Easing, Tween, remove as removeTween } from "@tweenjs/tween.js";
+import chroma from "chroma-js";
 
 // import Object3D from './Object3D.js';
-import PlanetGroup from './PlanetGroup.js';
-import Globe, { globeProps } from './Globe.js';
-import Tree from './Tree.js';
-import Rock from './Rock.js';
-import { getFibonacciSpherePoints } from './factory.js';
+import PlanetGroup from "./PlanetGroup.js";
+import Globe, { globeProps } from "./Globe.js";
+import Tree from "./Tree.js";
+import Rock from "./Rock.js";
+import { getFibonacciSpherePoints } from "./factory.js";
 
 const { randFloat } = MathUtils;
 
@@ -36,22 +42,22 @@ export const planetProps = {
   maxRocks: { type: Number, default: 200 },
   treeSize: { type: Number, default: 1 },
   rockSize: { type: Number, default: 1 },
-  treeTrunkColor: { type: String, default: '#764114' },
-  treeBodyColor1: { type: String, default: '#509A36' },
-  treeBodyColor2: { type: String, default: '#FF5A36' },
-  treeBodyColor3: { type: String, default: '#509A36' },
-  treeBodyColor4: { type: String, default: '#FFC236' },
-  treeBodyColor5: { type: String, default: '#509A36' },
-  rockColor: { type: String, default: '#808080' },
+  treeTrunkColor: { type: String, default: "#764114" },
+  treeBodyColor1: { type: String, default: "#509A36" },
+  treeBodyColor2: { type: String, default: "#FF5A36" },
+  treeBodyColor3: { type: String, default: "#509A36" },
+  treeBodyColor4: { type: String, default: "#FFC236" },
+  treeBodyColor5: { type: String, default: "#509A36" },
+  rockColor: { type: String, default: "#808080" },
   duration: { type: Number, default: 750 },
   delay: { type: Number, default: 0 },
 };
 
 export default {
-  name: 'LittlePlanet',
+  name: "LittlePlanet",
   // extends: Object3D,
   components: { PlanetGroup, Globe, Tree, Rock },
-  inject: ['three', 'scene', 'rendererComponent'],
+  inject: ["three", "scene", "rendererComponent"],
   props: planetProps,
   setup() {
     return {
@@ -78,7 +84,13 @@ export default {
     this.globe = this.globeC.globe;
 
     // trees colors
-    this.cscale = chroma.scale([this.treeBodyColor1, this.treeBodyColor2, this.treeBodyColor3, this.treeBodyColor4, this.treeBodyColor5]);
+    this.cscale = chroma.scale([
+      this.treeBodyColor1,
+      this.treeBodyColor2,
+      this.treeBodyColor3,
+      this.treeBodyColor4,
+      this.treeBodyColor5,
+    ]);
     // ['treeBodyColor1'].forEach(prop => {
     //   watch(() => this[prop], () => {
     //     this.cscale = chroma.scale([this.treeBodyColor1, this.treeBodyColor2, this.treeBodyColor3, this.treeBodyColor4, this.treeBodyColor5]);
@@ -144,32 +156,35 @@ export default {
       const bColor = this.cscale(vn2).hex();
 
       this.trees[`tree-${this.treesCounter++}`] = {
-        tSize, tColor: this.treeTrunkColor,
-        bSize, bColor,
+        tSize,
+        tColor: this.treeTrunkColor,
+        bSize,
+        bColor,
         lookAt: { x: 0, y: 0, z: 0 },
         ...tree,
       };
     },
     deleteTrees() {
-      Object.keys(this.trees).forEach(key => delete this.trees[key]);
+      Object.keys(this.trees).forEach((key) => delete this.trees[key]);
     },
     addRock(rock) {
-      const keys = Object.keys(this.rocks);
-      const length = keys.length;
-      if (length >= this.maxRocks) delete this.rocks[keys[0]];
-
-      this.rocks[`rock-${this.rocksCounter++}`] = {
-        color: this.rockColor,
-        size: randFloat(2, 4) * this.rockSize,
-        ...rock,
-      };
+      // const keys = Object.keys(this.rocks);
+      // const length = keys.length;
+      // if (length >= this.maxRocks) delete this.rocks[keys[0]];
+      // this.rocks[`rock-${this.rocksCounter++}`] = {
+      //   color: this.rockColor,
+      //   size: randFloat(2, 4) * this.rockSize,
+      //   ...rock,
+      // };
     },
     deleteRocks() {
-      Object.keys(this.rocks).forEach(key => delete this.rocks[key]);
+      Object.keys(this.rocks).forEach((key) => delete this.rocks[key]);
     },
     raycast(mouse, camera) {
       this.raycaster.setFromCamera(mouse, camera);
-      const objects = this.raycaster.intersectObject(this.$refs.raycastMesh.mesh);
+      const objects = this.raycaster.intersectObject(
+        this.$refs.raycastMesh.mesh
+      );
       if (objects.length) {
         const { vNoise, dispV } = this.globeC;
         const { noiseF, noiseWaterLevel } = this.noiseConf;
@@ -177,7 +192,7 @@ export default {
         if (vNoise(p, noiseF) !== noiseWaterLevel) {
           dispV(p);
           return p;
-        };
+        }
       }
     },
     // show(onComplete) {
